@@ -1,4 +1,5 @@
 from numpy import *
+from random import *
 class Logis(object):
 	def loaddata(self):
 		datamat,labelmat = [],[]
@@ -11,6 +12,13 @@ class Logis(object):
 
 	def sigmoid(self,x):
 		return 1.0/(1+exp(-x))
+
+	def classify(self,x,weights):
+		prob = self.sigmoid(sum(x*weights))
+		if prob>0.5:
+			return 1.0
+		else:
+			return 0.0
 
 	def gradascend(self,datain,labelin):   # 梯度上升方法,不同函数尽量不要用同一个变量名
 		datam = mat(datain)
@@ -25,6 +33,32 @@ class Logis(object):
 			weight = weight +alpha*datam.transpose()*error
 		return weight
 	
+	def stogradascend(self,datain,labelin,numiter):   # 随机梯度下降算法
+		m,n = shape(datain)
+		weight = ones(n)
+		for j in range(numiter):
+			dataindex = list(range(m))
+			for i in range(m):
+				alpha = 4.0/(1.0+i+j)+0.01   # 每次学习系数都变化,时间越久学习系数越小
+				randindex = int(uniform(0,len(dataindex)))
+				h = self.sigmoid(sum(datain[randindex]*weight))  # 这里不是矩阵乘法,就是对应相乘,sum是求内积
+				error = labelin[randindex] - h
+				weight = weight+alpha*error*array(datain[randindex])
+				del(dataindex[randindex])
+		return weight
+
+	def colictest(self):
+		frtrain = open('horseColicTraining.txt')
+		frtest = open('horseColicTest.txt')
+		trainset,trainlabels = [],[]
+		for line in frtrain.readlines():
+			cline = line.strip().split('\t')
+			linearr = []
+			for i in range(21):
+				linearr.append(float(cline[i]))
+			trainset.append(linearr)
+			trainlabels.append(float(cline[21]))
+		print(trainlabels)
 
 
 def plotBestFit(weights):
@@ -49,7 +83,8 @@ def plotBestFit(weights):
     plt.xlabel('X1'); plt.ylabel('X2');
     plt.show()
 
-data,label = Logis().loaddata()
-weights = Logis().gradascend(data,label)
-print(weights)
-plotBestFit(weights.getA())
+# data,label = Logis().loaddata()
+# weights = Logis().stogradascend(data,label,150)
+# print(weights)
+# plotBestFit(weights)
+Logis().colictest()
