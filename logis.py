@@ -11,7 +11,7 @@ class Logis(object):
 		return datamat,labelmat
 
 	def sigmoid(self,x):
-		return 1.0/(1+exp(-x))
+		return 1.0/(1.0+exp(-x))
 
 	def classify(self,x,weights):
 		prob = self.sigmoid(sum(x*weights))
@@ -58,7 +58,20 @@ class Logis(object):
 				linearr.append(float(cline[i]))
 			trainset.append(linearr)
 			trainlabels.append(float(cline[21]))
-		print(trainlabels)
+		trainweight = self.stogradascend(array(trainset),array(trainlabels),500)
+		errorcount = 0
+		numtest = 0.0
+		for line in frtest.readlines():
+			numtest += 1.0
+			cline = line.strip().split('\t')
+			linearr = []
+			for i in range(21):
+				linearr.append(float(cline[i]))
+			if int(self.classify(array(linearr),trainweight))!=int(cline[21]):
+				errorcount += 1
+		errorrate = float(errorcount)/numtest
+		print(errorrate)
+
 
 
 def plotBestFit(weights):
