@@ -47,7 +47,7 @@ class Logis(object):
 				del(dataindex[randindex])
 		return weight
 
-	def colictest(self):
+	def colictest(self,k):
 		frtrain = open('horseColicTraining.txt')
 		frtest = open('horseColicTest.txt')
 		trainset,trainlabels = [],[]
@@ -58,7 +58,7 @@ class Logis(object):
 				linearr.append(float(cline[i]))
 			trainset.append(linearr)
 			trainlabels.append(float(cline[21]))
-		trainweight = self.stogradascend(array(trainset),array(trainlabels),500)
+		trainweight = self.stogradascend(array(trainset),array(trainlabels),k)
 		errorcount = 0
 		numtest = 0.0
 		for line in frtest.readlines():
@@ -70,7 +70,7 @@ class Logis(object):
 			if int(self.classify(array(linearr),trainweight))!=int(cline[21]):
 				errorcount += 1
 		errorrate = float(errorcount)/numtest
-		print(errorrate)
+		return errorrate
 
 
 
@@ -100,4 +100,10 @@ def plotBestFit(weights):
 # weights = Logis().stogradascend(data,label,150)
 # print(weights)
 # plotBestFit(weights)
-Logis().colictest()
+fr = open('logistic.plt','w')
+fr.write('variables = k,err'+'\n')
+for k in range(100,1000,50):
+	err1 = Logis().colictest(k)
+	fr.write(str(float(k))+','+str(float(err1))+'\n')
+
+fr.close()
